@@ -32,10 +32,12 @@
       const videoElm = document.getElementById('service-worker-video')
       videoElm.src = '/api/asset/YDGHmx1p6_aHjcfk-m9OR.mp4'
 
+      console.time('time to make blob')
       const req = new Request({url: '/api/asset/YDGHmx1p6_aHjcfk-m9OR.mp4', headers: {'X-Modfy-Fetched-File': 'true'}})
       const res = await handle.match(req)
       const blob = await res.blob()
       console.log(URL.createObjectURL(blob))
+      console.timeEnd('time to make blob')
 
       const videoElm2 = document.getElementById('blob-video')
       videoElm2.src = URL.createObjectURL(blob)
