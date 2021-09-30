@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h4>Service worker</h4>
+  <video controls id="service-worker-video" height="300px" style="margin-right: 18px;" crossorigin="anonymous"></video>
+
+  <br />
+
+  <h4>Blob url</h4>
+  <video controls id="blob-video" height="300px" style="margin-right: 18px;" crossorigin="anonymous"></video>
+
+  <script>
+    const main = async () => {
+      await navigator.serviceWorker.register('./service-worker.js').then(() => {
+        console.log('loaded')
+      }).catch(console.error)
+
+      const handle = await caches.open('modfy-assets')
+
+      await fetch('/media/YDGHmx1p6_aHjcfk-m9OR.mp4', {headers: {}}).then(async (response) => {
+        const req = new Request({url: '/api/asset/YDGHmx1p6_aHjcfk-m9OR.mp4', headers: {'X-Modfy-Fetched-File': 'true'}})
+        await handle.put(req, response)
+        console.log('added to cache')
+      }).catch(console.error)
+
+      const videoElm = document.getElementById('service-worker-video')
+      videoElm.src = '/api/asset/YDGHmx1p6_aHjcfk-m9OR.mp4'
+
+      const req = new Request({url: '/api/asset/YDGHmx1p6_aHjcfk-m9OR.mp4', headers: {'X-Modfy-Fetched-File': 'true'}})
+      const res = await handle.match(req)
+      const blob = await res.blob()
+      console.log(URL.createObjectURL(blob))
+
+      const videoElm2 = document.getElementById('blob-video')
+      videoElm2.src = URL.createObjectURL(blob)
+    }
+
+    main()
+  </script>
+</body>
+</html>
